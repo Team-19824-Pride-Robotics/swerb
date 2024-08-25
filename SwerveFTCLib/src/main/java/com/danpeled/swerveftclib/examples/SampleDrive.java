@@ -12,6 +12,7 @@ import com.danpeled.swerveftclib.Swerve.modules.AxonSwerveModule;
 import com.danpeled.swerveftclib.Swerve.modules.SwerveModuleConfiguration;
 import com.danpeled.swerveftclib.util.BaseDrive;
 import com.danpeled.swerveftclib.util.Location;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
@@ -24,10 +25,12 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 @TeleOp
 public class SampleDrive extends CommandOpMode {
     // Constants for motor and servo control
-    private static final double TICKS_PER_REVOLUTION = 537.6;  // example value
-    private static final double WHEEL_CIRCUMFERENCE = Math.PI * 0.1; // Wheel circumference in meters (example)
+    private static final double TICKS_PER_REVOLUTION = 28;  // example value
+    private static final double WHEEL_CIRCUMFERENCE = Math.PI * 0.05765; // Wheel circumference in meters (example)
     SwerveDrive swerveDrive;
     GamepadEx driver;
+
+    ExampleSwerveSubsystem swerveSubsystem;
 
     /**
      * Initializes the teleoperated mode by setting up the swerve drive subsystem,
@@ -35,6 +38,7 @@ public class SampleDrive extends CommandOpMode {
      */
     @Override
     public void initialize() {
+
         driver = new GamepadEx(gamepad1);
 
         swerveDrive = new SwerveDrive(this, new SwerveDriveCoefficients(
@@ -46,16 +50,17 @@ public class SampleDrive extends CommandOpMode {
                 new Translation2d(5, -5),
                 new Translation2d(-5, -5),
                 "imu 1")
+
         );
 
         swerveDrive.init(AxonSwerveModule.class, new SwerveModuleConfiguration[]{
-                SwerveModuleConfiguration.create("fl_drive", "fl_angle", "fl_encoder"),
-                SwerveModuleConfiguration.create("fr_drive", "fr_angle", "fr_encoder"),
-                SwerveModuleConfiguration.create("bl_drive", "bl_angle", "bl_encoder"),
-                SwerveModuleConfiguration.create("br_drive", "br_angle", "br_encoder")
+                SwerveModuleConfiguration.create("RL", "sLF", "eLF"),
+                SwerveModuleConfiguration.create("RF", "sRF", "eRF"),
+                SwerveModuleConfiguration.create("LB", "sLB", "eLB"),
+                SwerveModuleConfiguration.create("RB", "sRB", "eRB")
         });
 
-        ExampleSwerveSubsystem swerveSubsystem = new ExampleSwerveSubsystem(swerveDrive);
+        swerveSubsystem = new ExampleSwerveSubsystem(swerveDrive);
         // Set the default command for the swerve drive to SetPowerOriented
         swerveSubsystem.setDefaultCommand(
                 new SwerveCommands.SetPowerOriented(
@@ -77,13 +82,14 @@ public class SampleDrive extends CommandOpMode {
 
         // Assign the GoTo command to the A button
         exampleButton.whenPressed(new SwerveCommands.GoTo(swerveSubsystem, new Location(0, 0), defaultGoToSettings));
-
         // Register the swerve drive subsystem
         register(swerveSubsystem);
+
     }
 
     @Override
     public void run() {
+        swerveSubsystem.getDefaultCommand().schedule();
     }
 
 }
