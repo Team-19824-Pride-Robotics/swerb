@@ -29,6 +29,7 @@ public class SampleDrive extends CommandOpMode {
     private static final double WHEEL_CIRCUMFERENCE = Math.PI * 0.05765; // Wheel circumference in meters (example)
     SwerveDrive swerveDrive;
     GamepadEx driver;
+    ExampleSwerveSubsystem swerveSubsystem;
 
     ExampleSwerveSubsystem swerveSubsystem;
 
@@ -91,5 +92,4 @@ public class SampleDrive extends CommandOpMode {
     public void run() {
         swerveSubsystem.getDefaultCommand().schedule();
     }
-
 }
